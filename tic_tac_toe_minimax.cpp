@@ -7,13 +7,16 @@ char check_win(char (&board)[9]);
 int minimax(char (&board)[9], char turn);
 
 static char board[9] = {' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '};
-static char player = 'O';
-static char computer = 'X';
+static char player;
+static char computer;
 static int count = 0;
 
 int main() {
 
     draw_board(board);
+    std::cout << "Enter the symbol you want to play with (X / O): ";
+    std::cin >> std::ws >> player;
+    computer = player == 'O' ? 'X' : 'O';
 
     while (true) {
         player_move(board, player);
