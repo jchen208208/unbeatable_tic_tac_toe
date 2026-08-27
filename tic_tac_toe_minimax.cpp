@@ -1,5 +1,6 @@
 #include <iostream>
 #include <ctime>
+#include <string>
 
 void draw_board(char (&board)[9]);
 void player_move(char (&board)[9], char player);
@@ -14,19 +15,34 @@ static char computer;
 static int count = 0;
 
 int main() {
+    bool play_again = false;
 
-    draw_board(board);
-    std::cout << "Enter the symbol you want to play with (X / O): ";
-    std::cin >> std::ws >> player;
-    computer = player == 'O' ? 'X' : 'O';
+    do {
+        draw_board(board);
+        std::cout << "Enter the symbol you want to play with (X / O): ";
+        std::cin >> std::ws >> player;
+        computer = player == 'O' ? 'X' : 'O';
 
-    int turn;
-    srand(time(0));
-    turn = rand() % 2;
+        int turn;
+        srand(time(0));
+        turn = rand() % 2;
 
-    while (one_turn(board, player, computer, turn) != 1) {
-        turn++;
-    }
+        while (one_turn(board, player, computer, turn) != 1) {
+            turn++;
+        }
+
+        for (int i = 0; i < 9; i++) {
+            board[i] = ' ';
+        }
+        count = 0;
+
+        std::string yes_no;
+        std::cout << "Play again? (yes/no) ";
+        std::getline(std::cin >> std::ws, yes_no);
+        play_again = yes_no == "yes" ? true : false;
+
+    } while(play_again);
+    
 
     return 0;
 }
@@ -136,7 +152,7 @@ int minimax(char (&board)[9], char turn, int depth) {
         }
     }
 
-    int best;  // best is the best possible outcome score (1 for computer win, -1 for player win, 0 for tie)
+    int best;  // best is the best possible outcome score (1 to 9 for computer win, -1 to -9 for player win, 0 for tie)
 
     if (turn == computer) {
         best = -1000000;
