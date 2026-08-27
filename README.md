@@ -1,1 +1,1 @@
-An unbeatable tic-tac-toe AI opponent in C++ using a minimax adversarial search algorithm. Tested against all 681 games a human can play against it, with each game ending in a computer win or a draw.
+An unbeatable tic-tac-toe AI opponent in C++ using a depth-weighted minimax adversarial search algorithm. Tested against all 681 games a human can play against it, with each game ending in a computer win or a draw.
