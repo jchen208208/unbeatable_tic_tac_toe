@@ -17,6 +17,8 @@ static int count = 0;
 int main() {
     bool play_again = false;
 
+    srand(time(0));
+
     do {
         draw_board(board);
         std::cout << "Enter the symbol you want to play with (X / O): ";
@@ -24,7 +26,6 @@ int main() {
         computer = player == 'O' ? 'X' : 'O';
 
         int turn;
-        srand(time(0));
         turn = rand() % 2;
 
         while (one_turn(board, player, computer, turn) != 1) {
@@ -81,7 +82,8 @@ void player_move(char (&board)[9], char player) {
 
 void computer_move(char (&board)[9], char computer) {
     int best = -1000000;
-    int best_slot = -1;
+    int best_slots[9] = {0};
+    int j = 0;
 
     for (int i = 0; i < 9; i++) {
         if (board[i] != ' ') {
@@ -92,11 +94,17 @@ void computer_move(char (&board)[9], char computer) {
         int new_best = minimax(board, player, 0);
         if (new_best > best) {
             best = new_best;
-            best_slot = i;
+            j = 0;
+            best_slots[j++] = i;
+        }
+        else if (new_best == best) {
+            best_slots[j++] = i;
         }
         board[i] = ' ';
     }
 
+    int best_slot;
+    best_slot = best_slots[rand() % j];  // computer selects a random spot among spots with tied best scores, to add randomness
     board[best_slot] = computer;
     printf("Computer chose spot %i\n", best_slot + 1);
     count++;
