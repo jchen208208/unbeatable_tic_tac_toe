@@ -1,10 +1,12 @@
 #include <iostream>
+#include <ctime>
 
 void draw_board(char (&board)[9]);
 void player_move(char (&board)[9], char player);
 void computer_move(char (&board)[9], char computer);
 char check_win(char (&board)[9]);
-int minimax(char (&board)[9], char turn);
+int minimax(char (&board)[9], char turn, int depth);
+int one_turn(char (&board)[9], char player, char computer, int whose_turn);
 
 static char board[9] = {' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '};
 static char player;
@@ -18,28 +20,12 @@ int main() {
     std::cin >> std::ws >> player;
     computer = player == 'O' ? 'X' : 'O';
 
-    while (true) {
-        player_move(board, player);
-        draw_board(board);
-        if (check_win(board) == player) {
-            std::cout << "You win!\n";
-            break;
-        }
-        if (count == 9) {
-            std::cout << "It's a tie!\n";
-            break;
-        }
+    int turn;
+    srand(time(0));
+    turn = rand() % 2;
 
-        computer_move(board, computer);
-        draw_board(board);
-        if (check_win(board) == computer) {
-            std::cout << "You lose!\n";
-            break;
-        }
-        if (count == 9) {
-            std::cout << "It's a tie!\n";
-            break;
-        }
+    while (one_turn(board, player, computer, turn) != 1) {
+        turn++;
     }
 
     return 0;
@@ -87,7 +73,7 @@ void computer_move(char (&board)[9], char computer) {
         }
 
         board[i] = computer;
-        int new_best = minimax(board, player);
+        int new_best = minimax(board, player, 0);
         if (new_best > best) {
             best = new_best;
             best_slot = i;
@@ -129,14 +115,14 @@ char check_win(char (&board)[9]) {
     return 0;
 }
 
-int minimax(char (&board)[9], char turn) {
+int minimax(char (&board)[9], char turn, int depth) {
     char winner  = check_win(board);
 
     if (winner == computer) {
-        return 1;
+        return 10 - depth;
     }
     else if (winner == player) {
-        return -1;
+        return depth - 10;
     }
     else {
         int i;
@@ -167,7 +153,7 @@ int minimax(char (&board)[9], char turn) {
 
         for (int i = 0; i < num_empty_space; i++) {
             board[empty_spaces[i]] = computer;
-            int new_best = minimax(board, player);
+            int new_best = minimax(board, player, depth + 1);
             if (new_best > best) {
                 best = new_best;
             }
@@ -190,7 +176,7 @@ int minimax(char (&board)[9], char turn) {
 
         for (int i = 0; i < num_empty_space; i++) {
             board[empty_spaces[i]] = player;
-            int new_best = minimax(board, computer);
+            int new_best = minimax(board, computer, depth + 1);
             if (new_best < best) {
                 best = new_best;
             }
@@ -199,4 +185,31 @@ int minimax(char (&board)[9], char turn) {
     }
 
     return best;
+}
+
+int one_turn(char (&board)[9], char player, char computer, int whose_turn) {
+    char turn;
+
+    if (whose_turn % 2 == 1) {
+        turn = player;
+        player_move(board, player);
+    }
+
+    else {
+        turn = computer;
+        computer_move(board, computer);
+    }
+
+    draw_board(board);
+    if (check_win(board) == turn) {
+        std::string msg = turn == computer ? "You lose!" : "You win!";
+        std::cout << msg << "\n";
+        return 1;
+    }
+    if (count == 9) {
+        std::cout << "It's a tie!\n";
+        return 1;
+    }
+    
+    return 0;
 }
