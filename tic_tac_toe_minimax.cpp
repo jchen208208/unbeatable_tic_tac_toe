@@ -6,7 +6,7 @@ void draw_board(char (&board)[9]);
 void player_move(char (&board)[9], char player);
 void computer_move(char (&board)[9], char computer);
 char check_win(char (&board)[9]);
-int minimax(char (&board)[9], char turn, int depth);
+int minimax(char (&board)[9], char turn, int depth, int alpha, int beta);
 int one_turn(char (&board)[9], char player, char computer, int whose_turn);
 
 static char board[9] = {' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '};
@@ -91,7 +91,7 @@ void computer_move(char (&board)[9], char computer) {
         }
 
         board[i] = computer;
-        int new_best = minimax(board, player, 0);
+        int new_best = minimax(board, player, 0, -1000000, 1000000);
         if (new_best > best) {
             best = new_best;
             j = 0;
@@ -139,7 +139,7 @@ char check_win(char (&board)[9]) {
     return 0;
 }
 
-int minimax(char (&board)[9], char turn, int depth) {
+int minimax(char (&board)[9], char turn, int depth, int alpha, int beta) {
     char winner  = check_win(board);
 
     if (winner == computer) {
@@ -177,11 +177,17 @@ int minimax(char (&board)[9], char turn, int depth) {
 
         for (int i = 0; i < num_empty_space; i++) {
             board[empty_spaces[i]] = computer;
-            int new_best = minimax(board, player, depth + 1);
+            int new_best = minimax(board, player, depth + 1, alpha, beta);
             if (new_best > best) {
                 best = new_best;
             }
+            if (new_best > alpha) {
+                alpha = new_best;
+            }
             board[empty_spaces[i]] = ' ';
+            if (alpha >= beta) {
+                break;
+            }
         }
     }
 
@@ -200,11 +206,17 @@ int minimax(char (&board)[9], char turn, int depth) {
 
         for (int i = 0; i < num_empty_space; i++) {
             board[empty_spaces[i]] = player;
-            int new_best = minimax(board, computer, depth + 1);
+            int new_best = minimax(board, computer, depth + 1, alpha, beta);
             if (new_best < best) {
                 best = new_best;
             }
+            if (new_best < beta) {
+                beta = new_best;
+            }
             board[empty_spaces[i]] = ' ';
+            if (beta <= alpha) {
+                break;
+            }
         }
     }
 
